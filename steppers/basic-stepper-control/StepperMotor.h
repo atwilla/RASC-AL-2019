@@ -1,7 +1,8 @@
 class Stepper {
   public:
     Stepper(int enablePin, int pulsePin, int dirPin);
-    void step(int dir);
+    void stepCW();
+    void stepCCW();
     void disable();
     void enable();
 
@@ -29,19 +30,28 @@ Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
     digitalWrite(pulsePin, LOW);
 }
 
-void Stepper::step(int dir) {
+void Stepper::stepCW() {
 
     int pulseDelay = 100; // This equals 0.5 * Period.
     digitalWrite(dirPin, HIGH); //Spins CW w/ respect to back by default.
-    if (dir == 0) {
-        digitalWrite(dirPin, LOW);
-    }
 
     // Driver suggests delay between setting direction and driving.
     delayMicroseconds(10);
 
     digitalWrite(pulsePin, HIGH);
-    //Serial.print("Stepping\n");
+    delayMicroseconds(pulseDelay);
+    digitalWrite(pulsePin, LOW);
+    delayMicroseconds(pulseDelay);
+}
+
+void Stepper::stepCCW() {
+
+    int pulseDelay = 100;
+    digitalWrite(dirPin, LOW);
+
+    delayMicroseconds(10);
+
+    digitalWrite(pulsePin, HIGH);
     delayMicroseconds(pulseDelay);
     digitalWrite(pulsePin, LOW);
     delayMicroseconds(pulseDelay);
