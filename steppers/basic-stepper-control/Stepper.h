@@ -10,6 +10,7 @@ class Stepper {
     int enablePin;
     int pulsePin;
     int dirPin;
+    int pulseDelay;
 };
 
 Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
@@ -19,6 +20,7 @@ Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
     this->enablePin = enablePin;
     this->pulsePin = pulsePin;
     this->dirPin = dirPin;
+    this->pulseDelay = 100;
     
     // Reduce code required to use stepper.
     pinMode(enablePin, OUTPUT);
@@ -32,7 +34,7 @@ Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
 
 void Stepper::stepCW() {
 
-    int pulseDelay = 100; // This equals 0.5 * Period.
+    //int pulseDelay = 100; // This equals 0.5 * Period.
     digitalWrite(dirPin, HIGH); //Spins CW w/ respect to back by default.
 
     // Driver suggests delay between setting direction and driving.
@@ -46,7 +48,7 @@ void Stepper::stepCW() {
 
 void Stepper::stepCCW() {
 
-    int pulseDelay = 100;
+    //int pulseDelay = 100;
     digitalWrite(dirPin, LOW);
 
     delayMicroseconds(10);
