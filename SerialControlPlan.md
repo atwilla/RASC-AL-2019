@@ -27,13 +27,14 @@ unexpected current consumption.
 
 A. Safety Codes
 
-1. 000 - Complete shutdown of all signal output. Arduino only looks for 
-the activation code after this code has been given.
-2. 001 - The activation code. Used to "reboot" arduino after previous 
+1. 001 - Complete shutdown of all signal output. Arduino only looks for 
+the activation code after this code has been given. This only affects the 
+arduino used to drive the devices.
+2. 002 - The activation code. Used to "reboot" arduino after previous 
 code has been used.
-3. 002 - Heating mode. In this mode, the arduino only dedicates power 
+3. 003 - Heating mode. In this mode, the arduino only dedicates power 
 to the heating element.
-4. 003 - Deactivate heating mode.
+4. 004 - Deactivate heating mode.
 
 B. Transverse stepper motors
 
