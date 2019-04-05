@@ -38,30 +38,28 @@ to the heating element.
 
 B. Transverse stepper motors
 
-1. 100 - Disable the steppers.
-2. 101 - Enable the steppers.
-3. 102 - Rotate the steppers clockwise.
-4. 103 - Rotate the steppers counterclockwise.
+1. 010 - Disable the steppers.
+2. 011 - Enable the steppers.
+3. 012 - Rotate the steppers clockwise.
+4. 013 - Rotate the steppers counterclockwise.
 
 C. Heating Element
 
-1. 200 - Disable the heating element.
-2. 201 - Enable the heating element.
+1. 020 - Disable the heating element.
+2. 021 - Enable the heating element.
 
 D. Pump
 
-1. 300 - Disable the pump.
-2. 301 - Pump forwards.
-3. 302 - Pump backwards.
+1. 030 - Disable the pump.
+2. 031 - Pump forwards.
+3. 032 - Pump backwards.
 
 E. Large Linear Actuator
 
-1. 400 - Disable actuator.
-2. 401 - Extend actuator.
-3. 402 - Retract actuator.
+1. 040 - Disable actuator.
+2. 041 - Extend actuator.
+3. 042 - Retract actuator.
 
 F. Small Linear Actuator
 
-1. 500 - Disable actuator.
-2. 5X1 - Extend actuator. X = speed setting.
-3. 5X2 - Retract actuator. X = speed setting.
+1. 050 - Disable actuator.
