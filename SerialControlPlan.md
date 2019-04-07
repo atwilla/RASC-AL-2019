@@ -42,6 +42,7 @@ B. Transverse stepper motors
 2. 011 - Enable the steppers.
 3. 012 - Rotate the steppers clockwise.
 4. 013 - Rotate the steppers counterclockwise.
+5. 014 - Stop rotation.
 
 C. Heating Element
 
@@ -50,16 +51,18 @@ C. Heating Element
 
 D. Pump
 
-1. 030 - Disable the pump.
+1. 030 - Stop pumping.
 2. 031 - Pump forwards.
 3. 032 - Pump backwards.
 
 E. Large Linear Actuator
 
-1. 040 - Disable actuator.
+1. 040 - Stop movement.
 2. 041 - Extend actuator.
 3. 042 - Retract actuator.
 
 F. Small Linear Actuator
 
-1. 050 - Disable actuator.
+1. 050 - Stop movement.
+2. 051 - Extend actuator.
+3. 052 - Retract acutator.
