@@ -10,9 +10,19 @@ bool pump = false, pumpDir = true;
 bool largeLin = false, largeLineDir = true;
 bool smallLin = false, smallLinDir = true;
 
+//Enable, direction, pulse.
+Stepper transMotors(48, 50, 52);
 
 void setup() {
+  Serial.begin(2000000);
   
+  pinMode(48, OUTPUT);
+  pinMode(50, OUTPUT);
+  pinMode(52, OUTPUT);
+
+  //digitalWrite(48, HIGH);
+  //digitalWrite(50, HIGH);
+  //digitalWrite(52, HIGH);
 }
 
 void loop() {
@@ -20,6 +30,7 @@ void loop() {
   if (Serial.available()) {
     controlCode = Serial.read();
     lastDigit = controlCode % 10;
+    Serial.println(controlCode);
     
     if (controlCode >= 60) {
       // Vertical stepper options.
@@ -64,9 +75,11 @@ void loop() {
       switch (lastDigit) {
         case 0:
           transStepEn = false;
+          transMotors.disable();
           break;
         case 1:
           transStepEn = true;
+          transMotors.enable();
           break;
         case 2:
           transStep = true;
@@ -86,6 +99,22 @@ void loop() {
     } else if (controlCode >= 0) {
       // Safety options.
       
+    }
+  }
+
+  // Check all control vars and act accordingly.
+
+  // Transverse stepper actions
+  if (transStepEn) {
+  
+    if (transStep) {
+      
+      if (transStepDir) {
+        transMotors.stepCW();
+        
+      } else {
+        transMotors.stepCCW();
+      }
     }
   }
 }

@@ -6,23 +6,30 @@ class SensorPane(Frame):
 	pass
 
 class ControlPane(Frame):
-	def __init__(self, master=None):
+	def __init__(self, master=None, serialPort="/dev/ttyACM0"):
 		Frame.__init__(self, master)
-		self.pack()
 
-		self.stepperControl = StepperControl(self)
-		self.stepperControl.pack()
+		self.arduino = serial.Serial(serialPort, 2000000)
+		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
+		self.stepperControlVert = StepperControl(self, range(60, 65), "Vertical Stepper Control")
+
+		self.stepperControlTrans.pack()
+		self.stepperControlVert.pack()
 
 class StepperControl(Frame):
-	def __init__(self, master=None):
+	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Stepper Control"):
 		Frame.__init__(self, master)
 		self.state = "normal"
+		self.codes = codes
+		self.arduino = self.master.arduino
 
+		self.title = Label(self, text=title)
 		self.enableDisable = Button(self, text="Enable/Disbale", command=self.switchMode)
 		self.cwSwitch = Button(self, text="Step CW", command=self.driveCW)
 		self.ccwSwitch = Button(self, text="Step CCW", command=self.driveCCW)
 		self.stopSwitch = Button(self, text="Stop Motors", command=self.stopMotors)
 		
+		self.title.pack(side="top")
 		self.enableDisable.pack(side="left")
 		self.cwSwitch.pack(side="left")
 		self.ccwSwitch.pack(side="left")
@@ -33,11 +40,14 @@ class StepperControl(Frame):
 
 		if self.state == "normal":
 			newState = "disabled"
-			print(100)
+			print(self.codes[0])
+			self.arduino.write(chr(self.codes[0]).encode())
 
 		else:
 			newState = "normal"
-			print(101)
+			print(self.codes[1])
+			self.arduino.write(chr(self.codes[1]).encode())
+
 
 		self.cwSwitch['state'] = newState
 		self.ccwSwitch['state'] = newState
@@ -45,13 +55,16 @@ class StepperControl(Frame):
 		self.state = newState
 
 	def driveCW(self):
-		print(102)
+		print(self.codes[2])
+		self.arduino.write(chr(self.codes[2]).encode())
 
 	def driveCCW(self):
-		print(103)
+		print(self.codes[3])
+		self.arduino.write(chr(self.codes[3]).encode())
 
 	def stopMotors(self):
-		print(104)
+		print(self.codes[4])
+		self.arduino.write(chr(self.codes[4]).encode())
 
 class DigitalCore(Frame):
 	def __init__(self, master=None):
@@ -77,6 +90,4 @@ class ControlApp(Frame):
 root = ControlApp()
 root.master.title('Excavation Control Program')
 
-while True:
-	root.update_idletasks()
-	root.update()
+root.mainloop()
