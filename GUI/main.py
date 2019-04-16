@@ -3,18 +3,48 @@ import serial
 from tkinter import *
 
 class SensorPane(Frame):
-	pass
+	def __init__(self, master=None, serialPort=None):
+		Frame.__init__(self, master=None)
+
+		self.digitalCore = DigitalCore(self)
+		self.currentReadings = CurrentReadings(self)
+
+		self.digitalCore.pack()
+		self.currentReadings.pack()
 
 class ControlPane(Frame):
-	def __init__(self, master=None, serialPort="/dev/ttyACM0"):
+	def __init__(self, master=None, serialPort=None):
 		Frame.__init__(self, master)
 
-		self.arduino = serial.Serial(serialPort, 2000000)
+		if serialPort != None:
+			self.arduino = serial.Serial(serialPort, 2000000)
+		else:
+			self.arduino = None
+
+		self.safetyControls = SafetyControl(self)
 		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
 		self.stepperControlVert = StepperControl(self, range(60, 65), "Vertical Stepper Control")
 
+		self.safetyControls.pack()
 		self.stepperControlTrans.pack()
 		self.stepperControlVert.pack()
+
+
+class SafetyControl(Frame):
+	def __init__(self, master=None, title="Safety Controls"):
+		Frame.__init__(self, master)
+		self.title = Label(self, text=title)
+		# shutDown stops the Arduino from doing anything until it is lifted.
+		self.shutDown = Button(self, text="Shutdown Controls")
+		self.liftShutDown = Button(self, text="Lift Shutdown")
+		self.heatingMode = Button(self, text="Enable Heating Mode")
+		self.stopHeating = Button(self, text="Disable Heating Mode")
+
+		self.title.pack(side=TOP)
+		self.shutDown.pack(side=LEFT)
+		self.liftShutDown.pack(side=LEFT)
+		self.heatingMode.pack(side=LEFT)
+		self.stopHeating.pack(side=LEFT)
 
 class StepperControl(Frame):
 	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Stepper Control"):
@@ -69,10 +99,12 @@ class StepperControl(Frame):
 class DigitalCore(Frame):
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
-		Label(self, text="Digital Core will go here", bg="white").pack()
+		Label(self, text="Digital Core will go here").pack()
 
 class CurrentReadings(Frame):
-	pass
+	def __init__(self, master=None):
+		Frame.__init__(self, master)
+		Label(self, text="Current Readings will go here").pack()
 
 class ForceReadings(Frame):
 	pass
@@ -80,12 +112,13 @@ class ForceReadings(Frame):
 class ControlApp(Frame):
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
-		self.pack(expand=1, fill=BOTH)
+		self.pack(side=RIGHT)
 		
-		self.controlPane = ControlPane(self)
+		self.controlPane = ControlPane(self, serialPort=None)
+		self.sensorPane = SensorPane(self, serialPort=None)
 
 		self.controlPane.pack()
-
+		self.sensorPane.pack()
 
 root = ControlApp()
 root.master.title('Excavation Control Program')
