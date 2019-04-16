@@ -10,19 +10,23 @@ bool pump = false, pumpDir = true;
 bool largeLin = false, largeLineDir = true;
 bool smallLin = false, smallLinDir = true;
 
+const int transEnPin = 48, transDirPin = 50, transPulPin = 52;
+const int vertEnPin = 49, vertDirPin = 51, vertPulPin = 53;
+
 //Enable, direction, pulse.
-Stepper transMotors(48, 50, 52);
+Stepper transMotors(transEnPin, transDirPin, transPulPin);
+Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin);
 
 void setup() {
   Serial.begin(2000000);
   
-  pinMode(48, OUTPUT);
-  pinMode(50, OUTPUT);
-  pinMode(52, OUTPUT);
+  pinMode(transEnPin, OUTPUT);
+  pinMode(transDirPin, OUTPUT);
+  pinMode(transPulPin, OUTPUT);
 
-  //digitalWrite(48, HIGH);
-  //digitalWrite(50, HIGH);
-  //digitalWrite(52, HIGH);
+  pinMode(vertEnPin, OUTPUT);
+  pinMode(vertDirPin, OUTPUT);
+  pinMode(vertPulPin, OUTPUT);
 }
 
 void loop() {
@@ -110,10 +114,24 @@ void loop() {
     if (transStep) {
       
       if (transStepDir) {
-        transMotors.stepCW();
+        transMotors.stepCW(500);
         
       } else {
-        transMotors.stepCCW();
+        transMotors.stepCCW(500);
+      }
+    }
+  }
+
+  //Vertical stepper actions
+  if (vertStepEn) {
+
+    if (vertStep) {
+
+      if (vertStepDir) {
+        vertMotor.stepCW(500); 
+             
+      } else {
+        vertMotor.stepCCW(500);
       }
     }
   }

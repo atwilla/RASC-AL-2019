@@ -1,8 +1,8 @@
 class Stepper {
   public:
-    Stepper(int enablePin, int pulsePin, int dirPin);
-    void stepCW();
-    void stepCCW();
+    Stepper(int enablePin, int dirPin, int pulsePin);
+    void stepCW(int pulseDelay = 100);
+    void stepCCW(int pulseDelay = 100);
     void disable();
     void enable();
 
@@ -13,14 +13,14 @@ class Stepper {
     int pulseDelay;
 };
 
-Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
+Stepper::Stepper(int enablePin, int dirPin, int pulsePin) {
     // Constructor for Stepper class. Given pins will be enabled 
     // as output pins.
    
     this->enablePin = enablePin;
     this->pulsePin = pulsePin;
     this->dirPin = dirPin;
-    this->pulseDelay = 100;
+    //this->pulseDelay = 100;
     
     // Reduce code required to use stepper.
     pinMode(enablePin, OUTPUT);
@@ -32,7 +32,7 @@ Stepper::Stepper(int enablePin, int pulsePin, int dirPin) {
     digitalWrite(pulsePin, LOW);
 }
 
-void Stepper::stepCW() {
+void Stepper::stepCW(int pulseDelay = 100) {
 
     //int pulseDelay = 100; // This equals 0.5 * Period.
     digitalWrite(dirPin, HIGH); //Spins CW w/ respect to back by default.
@@ -46,7 +46,7 @@ void Stepper::stepCW() {
     delayMicroseconds(pulseDelay);
 }
 
-void Stepper::stepCCW() {
+void Stepper::stepCCW(int pulseDelay = 100) {
 
     //int pulseDelay = 100;
     digitalWrite(dirPin, LOW);
