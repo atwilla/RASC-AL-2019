@@ -8,11 +8,14 @@ class SensorPane(Frame):
 
 		self.digitalCore = DigitalCore(self)
 		self.currentReadings = CurrentReadings(self)
+		self.forceReadings = ForceReadings(self)
 
 		self.digitalCore.pack()
 		self.currentReadings.pack()
+		self.forceReadings.pack()
 
 class ControlPane(Frame):
+
 	def __init__(self, master=None, serialPort=None):
 		Frame.__init__(self, master)
 
@@ -24,58 +27,97 @@ class ControlPane(Frame):
 		self.safetyControls = SafetyControl(self)
 		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
 		self.stepperControlVert = StepperControl(self, range(60, 65), "Vertical Stepper Control")
+		self.actuatorControlLarge = ActuatorControl(self, range(40, 43), "Large Actuator Control")
+		self.actuatorControlSmall = ActuatorControl(self, range(50, 53), "Small Acutator Control")
+		self.heatingControl = HeatingControl(self, [20, 21])
+		self.pumpControl = PumpControl(self, range(30, 33))
 
 		self.safetyControls.pack()
 		self.stepperControlTrans.pack()
 		self.stepperControlVert.pack()
+		self.actuatorControlLarge.pack()
+		self.actuatorControlSmall.pack()
+		self.heatingControl.pack()
+		self.pumpControl.pack()
 
 
 class SafetyControl(Frame):
-	def __init__(self, master=None, title="Safety Controls"):
+
+	def __init__(self, master=None, codes=range(4), title="Safety Controls"):
 		Frame.__init__(self, master)
+
 		self.title = Label(self, text=title)
+		self.codes = codes
+		self.shutDown = False
+		self.heating = False
+
 		# shutDown stops the Arduino from doing anything until it is lifted.
-		self.shutDown = Button(self, text="Shutdown Controls")
+		self.shutDownSwitch = Button(self, text="Shutdown Controls", command=self.toggleShutdown)
 		self.liftShutDown = Button(self, text="Lift Shutdown")
-		self.heatingMode = Button(self, text="Enable Heating Mode")
+		self.heatingSwitch = Button(self, text="Enable Heating Mode", command=self.toggleHeating)
 		self.stopHeating = Button(self, text="Disable Heating Mode")
 
 		self.title.pack(side=TOP)
-		self.shutDown.pack(side=LEFT)
-		self.liftShutDown.pack(side=LEFT)
-		self.heatingMode.pack(side=LEFT)
-		self.stopHeating.pack(side=LEFT)
+		self.shutDownSwitch.pack(side=LEFT)
+		#self.liftShutDown.pack(side=LEFT)
+		self.heatingSwitch.pack(side=LEFT)
+		#self.stopHeating.pack(side=LEFT)
+
+	def toggleShutdown(self):
+
+		if self.shutDown:
+			print(self.codes[1])
+			self.shutDownSwitch['text'] = "Shutdown Controls"
+		else:
+			print(self.codes[0])
+			self.shutDownSwitch['text'] = "Lift Shutdown"
+
+		self.shutDown = not self.shutDown
+
+	def toggleHeating(self):
+
+		if self.heating:
+			print(self.codes[3])
+			self.heatingSwitch['text'] = "Enable Heating Mode"
+		else:
+			print(self.codes[2])
+			self.heatingSwitch['text'] = "Disable Heating Mode"
+
+		self.heating = not self.heating
 
 class StepperControl(Frame):
+
 	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Stepper Control"):
 		Frame.__init__(self, master)
+
 		self.state = "normal"
 		self.codes = codes
 		self.arduino = self.master.arduino
 
 		self.title = Label(self, text=title)
-		self.enableDisable = Button(self, text="Enable/Disbale", command=self.switchMode)
+		self.enableDisable = Button(self, text="Disbale", command=self.switchMode)
 		self.cwSwitch = Button(self, text="Step CW", command=self.driveCW)
-		self.ccwSwitch = Button(self, text="Step CCW", command=self.driveCCW)
 		self.stopSwitch = Button(self, text="Stop Motors", command=self.stopMotors)
+		self.ccwSwitch = Button(self, text="Step CCW", command=self.driveCCW)
 		
 		self.title.pack(side="top")
 		self.enableDisable.pack(side="left")
 		self.cwSwitch.pack(side="left")
-		self.ccwSwitch.pack(side="left")
 		self.stopSwitch.pack(side="left")
+		self.ccwSwitch.pack(side="left")
 
 	def switchMode(self):
-
 
 		if self.state == "normal":
 			newState = "disabled"
 			print(self.codes[0])
+			self.enableDisable['text'] = "Enable"
 			self.arduino.write(chr(self.codes[0]).encode())
 
 		else:
 			newState = "normal"
 			print(self.codes[1])
+			self.enableDisable['text'] = "Disable"
 			self.arduino.write(chr(self.codes[1]).encode())
 
 
@@ -96,20 +138,104 @@ class StepperControl(Frame):
 		print(self.codes[4])
 		self.arduino.write(chr(self.codes[4]).encode())
 
+class HeatingControl(Frame):
+
+	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Heating Control"):
+		Frame.__init__(self, master)
+
+		self.codes = codes
+		self.state = False
+
+		self.title = Label(self, text=title)
+		self.switch = Button(self, text="Activate Heating", command=self.heatingSwitch)
+
+		self.title.pack()
+		self.switch.pack()
+
+	def heatingSwitch(self):
+
+		# If heating on, disable, and allow activation.
+		if self.state:
+			print(self.codes[0])
+			self.switch['text'] = "Activate Heating"
+		else:
+			print(self.codes[1])
+			self.switch['text'] = "Disable Heating"
+
+		self.state = not self.state
+		
+class ActuatorControl(Frame):
+
+	def __init__(self, master=None, codes=range(3), title="Actuator Control"):
+		Frame.__init__(self, master)
+
+		self.title = Label(self, text=title)
+		self.codes = codes
+
+		self.extendSwitch = Button(self, text="Extend", command=self.extend)
+		self.stopSwitch = Button(self, text="Stop", command=self.stop)
+		self.retractSwitch = Button(self, text="Retract", command=self.retract)
+
+		self.title.pack()
+		self.extendSwitch.pack(side=LEFT)
+		self.stopSwitch.pack(side=LEFT)
+		self.retractSwitch.pack(side=LEFT)
+		
+	def extend(self):
+		print(self.codes[1])
+
+	def stop(self):
+		print(self.codes[0])
+
+	def retract(self):
+		print(self.codes[2])
+
+class PumpControl(Frame):
+
+	def __init__(self, master=None, codes=range(3), title="Pump Control"):
+		Frame.__init__(self, master)
+
+		self.title = Label(self, text=title)
+		self.codes = codes
+
+		self.pumpForwSwitch = Button(self, text="Pump Forward", command=self.pumpForw)
+		self.stopSwitch = Button(self, text="Stop Pump", command=self.stopPump)
+		self.pumpBackSwitch = Button(self, text="Pump BackWard", command=self.pumpBack)
+
+		self.title.pack()
+		self.pumpForwSwitch.pack(side=LEFT)
+		self.stopSwitch.pack(side=LEFT)
+		self.pumpBackSwitch.pack(side=LEFT)
+
+	def stopPump(self):
+		print(self.codes[0])
+
+	def pumpForw(self):
+		print(self.codes[1])
+
+	def pumpBack(self):
+		print(self.codes[2])
+
 class DigitalCore(Frame):
+
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
 		Label(self, text="Digital Core will go here").pack()
 
 class CurrentReadings(Frame):
+
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
 		Label(self, text="Current Readings will go here").pack()
 
 class ForceReadings(Frame):
-	pass
+
+	def __init__(self, master=None):
+		Frame.__init__(self, master)
+		Label(self, text="Weight on bit readings will go here").pack()
 
 class ControlApp(Frame):
+
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
 		self.pack(side=RIGHT)
