@@ -3,8 +3,15 @@ import serial
 from tkinter import *
 
 class SensorPane(Frame):
+	"""
+	This frame contains all data recorded from the arduino boards such 
+	as current readings, weight on bit, and the digital core.
+	"""
+
 	def __init__(self, master=None, serialPort=None):
 		Frame.__init__(self, master=None)
+
+		self.arduino = serialPort
 
 		self.digitalCore = DigitalCore(self)
 		self.currentReadings = CurrentReadings(self)
@@ -15,14 +22,21 @@ class SensorPane(Frame):
 		self.forceReadings.pack()
 
 class ControlPane(Frame):
+	"""
+	This frame contains all controls for the devices used in the device. 
+	These consist of various steppers, actuators, pump control, a heating 
+	element, and a few safety measures.
+	"""
 
 	def __init__(self, master=None, serialPort=None):
 		Frame.__init__(self, master)
 
-		if serialPort != None:
+		"""if serialPort != None:
 			self.arduino = serial.Serial(serialPort, 2000000)
 		else:
-			self.arduino = None
+			self.arduino = None"""
+
+		self.arduino = serialPort
 
 		self.safetyControls = SafetyControl(self)
 		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
@@ -42,18 +56,24 @@ class ControlPane(Frame):
 
 
 class SafetyControl(Frame):
+	"""
+	This frame contains various safety measures for the device.
+	"""
 
 	def __init__(self, master=None, codes=range(4), title="Safety Controls"):
 		Frame.__init__(self, master)
 
 		self.title = Label(self, text=title)
 		self.codes = codes
+		self.arduino = self.master.arduino
 		self.shutDown = False
 		self.heating = False
 
 		# shutDown stops the Arduino from doing anything until it is lifted.
 		self.shutDownSwitch = Button(self, text="Shutdown Controls", command=self.toggleShutdown)
 		self.liftShutDown = Button(self, text="Lift Shutdown")
+		# Heating mode locks all controls and activates heating element. This ensures that 
+		# we do not exceed the specified current limit (9 A).
 		self.heatingSwitch = Button(self, text="Enable Heating Mode", command=self.toggleHeating)
 		self.stopHeating = Button(self, text="Disable Heating Mode")
 
@@ -64,6 +84,7 @@ class SafetyControl(Frame):
 		#self.stopHeating.pack(side=LEFT)
 
 	def toggleShutdown(self):
+		# Send appropriate shutdown code and change button text to match.
 
 		if self.shutDown:
 			print(self.codes[1])
@@ -75,6 +96,7 @@ class SafetyControl(Frame):
 		self.shutDown = not self.shutDown
 
 	def toggleHeating(self):
+		# Send appropriate heating mode code and change button text to match.
 
 		if self.heating:
 			print(self.codes[3])
@@ -86,6 +108,10 @@ class SafetyControl(Frame):
 		self.heating = not self.heating
 
 class StepperControl(Frame):
+	"""
+	This frame contains controls for a stepper motor or for multiple 
+	stepper motors run in parallel.
+	"""
 
 	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Stepper Control"):
 		Frame.__init__(self, master)
@@ -107,6 +133,7 @@ class StepperControl(Frame):
 		self.ccwSwitch.pack(side="left")
 
 	def switchMode(self):
+		"""Enable and disable the stepper."""
 
 		if self.state == "normal":
 			newState = "disabled"
@@ -139,10 +166,14 @@ class StepperControl(Frame):
 		self.arduino.write(chr(self.codes[4]).encode())
 
 class HeatingControl(Frame):
+	"""
+	This frame contains controls for the heating element.
+	"""
 
 	def __init__(self, master=None, codes=[0, 1, 2, 3], title="Heating Control"):
 		Frame.__init__(self, master)
 
+		self.arduino = self.master.arduino
 		self.codes = codes
 		self.state = False
 
@@ -157,9 +188,11 @@ class HeatingControl(Frame):
 		# If heating on, disable, and allow activation.
 		if self.state:
 			print(self.codes[0])
+			self.arduino.write(chr(codes[0]).encode())
 			self.switch['text'] = "Activate Heating"
 		else:
 			print(self.codes[1])
+			self.arduino.write(chr(codes[1]).encode())
 			self.switch['text'] = "Disable Heating"
 
 		self.state = not self.state
@@ -169,6 +202,7 @@ class ActuatorControl(Frame):
 	def __init__(self, master=None, codes=range(3), title="Actuator Control"):
 		Frame.__init__(self, master)
 
+		self.arduino = self.master.arduino
 		self.title = Label(self, text=title)
 		self.codes = codes
 
@@ -195,6 +229,7 @@ class PumpControl(Frame):
 	def __init__(self, master=None, codes=range(3), title="Pump Control"):
 		Frame.__init__(self, master)
 
+		self.arduino = self.master.arduino
 		self.title = Label(self, text=title)
 		self.codes = codes
 
@@ -236,12 +271,21 @@ class ForceReadings(Frame):
 
 class ControlApp(Frame):
 
-	def __init__(self, master=None):
+	def __init__(self, master=None, controlPort=None, monitorPort=None):
 		Frame.__init__(self, master)
 		self.pack(side=RIGHT)
 		
-		self.controlPane = ControlPane(self, serialPort=None)
-		self.sensorPane = SensorPane(self, serialPort=None)
+		self.controlArduino = None
+		self.monitorArduino = None
+
+		if controlPort != None:
+			self.controlArduino = serial.Serial(controlPort, 2000000)
+
+		if monitorPort != None:
+			self.monitorArduino = serial.Serial(monitorPort, 2000000)
+
+		self.controlPane = ControlPane(self, serialPort=self.controlArduino)
+		self.sensorPane = SensorPane(self, serialPort=self.monitorArduino)
 
 		self.controlPane.pack()
 		self.sensorPane.pack()
