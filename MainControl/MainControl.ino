@@ -5,10 +5,11 @@ char controlCode, lastDigit;
 bool locked = false;
 bool transStepEn = true, transStep = false, transStepDir = true;
 bool vertStepEn = true, vertStep = false, vertStepDir = true;
-bool heating = false;
-bool pump = false, pumpDir = true;
-bool largeLin = false, largeLineDir = true;
-bool smallLin = false, smallLinDir = true;
+bool heatingMode = false;
+bool heatingEn = false;
+bool pumpEn = false, pumpDir = true;
+bool largeLinEn = false, largeLinDir = true;
+bool smallLinEn = false, smallLinDir = true;
 
 const int transEnPin = 48, transDirPin = 50, transPulPin = 52;
 const int vertEnPin = 49, vertDirPin = 51, vertPulPin = 53;
@@ -63,15 +64,64 @@ void loop() {
       
     } else if (controlCode >= 50) {
       // Small actuator options.
+
+      if (lastDigit == 0) {
+        smallLinEn = false;
+       
+      } else if (lastDigit == 1) {
+        //Extend actuator.
+        smallLinEn = true;
+        smallLinDir = true;
+        
+      } else if (lastDigit == 2) {
+        // Retract actuator.
+        smallLinEn = true;
+        smallLinDir = false;
+      }
       
     } else if (controlCode >= 40) {
-      // Transverse actuator options.
+      // Large actuator options
+      
+      if (lastDigit == 0) {
+        largeLinEn = false;
+        
+      } else if (lastDigit == 1) {
+        // Extend actuator.
+        largeLinEn = true;
+        largeLinDir = true;
+        
+      } else if (lastDigit == 2) {
+        // Retract actuator
+        largeLinEn = true;
+        largeLinDir = false;
+      }
       
     } else if (controlCode >= 30) {
       // Pump options.
+
+      if (lastDigit == 0) {
+        // Stop pump.
+        pumpEn = false;
+        
+      } else if (lastDigit == 1) {
+        // Pump forward.
+        pumpEn = true;
+        pumpDir = true;
+        
+      } else if (lastDigit == 2) {
+        // Pump backward.
+        pumpEn = true;
+        pumpDir = false;
+      }
       
     } else if (controlCode >= 20) {
       // Heating element options.
+
+      if (lastDigit == 0) {
+        heatingEn = true;
+      } else {
+        heatingEn = false;
+      }
       
     } else if (controlCode >= 10) {
       // Transverse steppers options.
@@ -108,6 +158,55 @@ void loop() {
 
   // Check all control vars and act accordingly.
 
+  //Vertical stepper actions
+  if (vertStepEn) {
+
+    if (vertStep) {
+
+      if (vertStepDir) {
+        vertMotor.stepCW(500); 
+             
+      } else {
+        vertMotor.stepCCW(500);
+      }
+    }
+  }
+
+  // Small actuator actions.
+  if (smallLinEn) {
+
+    if (smallLinDir) {
+      // Extend.
+    } else {
+      // Retract.
+    }
+  }
+
+  // Large actuator actions.
+  if (largeLinEn) {
+
+    if (largeLinDir) {
+      // Extend.
+    } else {
+      // Retract.
+    }
+  }
+
+  // Pump actions.
+  if (pumpEn) {
+    
+    if (pumpDir) {
+      // Pump forwards.
+    } else {
+      // Pump backwards.
+    }
+  }
+
+  // Heating actions
+  if (heatingEn) {
+    // Actiate heating element.
+  }
+  
   // Transverse stepper actions
   if (transStepEn) {
   
@@ -122,17 +221,4 @@ void loop() {
     }
   }
 
-  //Vertical stepper actions
-  if (vertStepEn) {
-
-    if (vertStep) {
-
-      if (vertStepDir) {
-        vertMotor.stepCW(500); 
-             
-      } else {
-        vertMotor.stepCCW(500);
-      }
-    }
-  }
 }

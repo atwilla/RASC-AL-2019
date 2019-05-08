@@ -217,12 +217,15 @@ class ActuatorControl(Frame):
 		
 	def extend(self):
 		print(self.codes[1])
+		self.arduino.write(chr(codes[2]).encode())
 
 	def stop(self):
 		print(self.codes[0])
+		self.arduino.write(chr(codes[0]).encode())
 
 	def retract(self):
 		print(self.codes[2])
+		self.arduino.write(chr(codes[2]).encode())
 
 class PumpControl(Frame):
 
@@ -244,12 +247,15 @@ class PumpControl(Frame):
 
 	def stopPump(self):
 		print(self.codes[0])
+		self.arduino.write(chr(codes[0]).encode())
 
 	def pumpForw(self):
 		print(self.codes[1])
+		self.arduino.write(chr(codes[1]).encode())
 
 	def pumpBack(self):
 		print(self.codes[2])
+		self.arduino.write(chr(codes[1]).encode())
 
 class DigitalCore(Frame):
 
