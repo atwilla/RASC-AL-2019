@@ -1,5 +1,6 @@
-#include "Relay.h"
+#include "L298N.h"
 #include "Pump.h"
+#include "Relay.h"
 #include "Stepper.h"
 
 char controlCode, lastDigit;
@@ -13,10 +14,15 @@ bool pumpEn = false, pumpDir = true;
 bool largeLinEn = false, largeLinDir = true;
 bool smallLinEn = false, smallLinDir = true;
 
+const int lAct1 = 30, lAct2 = 32, lActSpeed = 2;
+const int sAct1 = 31, sAct2 = 33, sActSpeed = 3;
+const int pumpPosPin = 51, pumpNegPin = 53;
 const int heatingPin = 52;
 const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
 const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
 
+L298N actuators(lAct1, lAct2, lActSpeed, sAct1, sAct2, sActSpeed);
+Pump pump(pumpPosPin, pumpNegPin);
 Relay heatingElement(heatingPin);
 
 //Enable, direction, pulse.
@@ -174,9 +180,14 @@ void loop() {
 
     if (smallLinDir) {
       // Extend.
+      actuators.drive('F', 'B', 125);
     } else {
       // Retract.
+      actuators.drive('R', 'B', 125);
     }
+    
+  } else {
+    actuators.stop('B');
   }
 
   // Large actuator actions.
@@ -184,19 +195,27 @@ void loop() {
 
     if (largeLinDir) {
       // Extend.
+      actuators.drive('F', 'A', 125);
     } else {
       // Retract.
+      actuators.drive('R', 'A', 125);
     }
+    
+  } else {
+    actuators.stop('A');
   }
 
   // Pump actions.
   if (pumpEn) {
     
     if (pumpDir) {
-      // Pump forwards.
+      pump.pumpForwards();
     } else {
-      // Pump backwards.
+      pump.pumpBackwards();
     }
+    
+  } else {
+    pump.stop();
   }
 
   // Heating actions
