@@ -1,3 +1,5 @@
+#include "Relay.h"
+#include "Pump.h"
 #include "Stepper.h"
 
 char controlCode, lastDigit;
@@ -11,8 +13,11 @@ bool pumpEn = false, pumpDir = true;
 bool largeLinEn = false, largeLinDir = true;
 bool smallLinEn = false, smallLinDir = true;
 
-const int transEnPin = 48, transDirPin = 50, transPulPin = 52;
-const int vertEnPin = 49, vertDirPin = 51, vertPulPin = 53;
+const int heatingPin = 52;
+const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
+const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
+
+Relay HeatingElement(heatingPin);
 
 //Enable, direction, pulse.
 Stepper transMotors(transEnPin, transDirPin, transPulPin);
@@ -20,14 +25,6 @@ Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin);
 
 void setup() {
   Serial.begin(2000000);
-  
-  pinMode(transEnPin, OUTPUT);
-  pinMode(transDirPin, OUTPUT);
-  pinMode(transPulPin, OUTPUT);
-
-  pinMode(vertEnPin, OUTPUT);
-  pinMode(vertDirPin, OUTPUT);
-  pinMode(vertPulPin, OUTPUT);
 }
 
 void loop() {
