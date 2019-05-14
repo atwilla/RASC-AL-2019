@@ -32,7 +32,7 @@ Stepper::Stepper(int enablePin, int dirPin, int pulsePin) {
     digitalWrite(pulsePin, LOW);
 }
 
-void Stepper::stepCW(int pulseDelay = 100) {
+void Stepper::stepCW(int pulseDelay) {
 
     //int pulseDelay = 100; // This equals 0.5 * Period.
     digitalWrite(dirPin, HIGH); //Spins CW w/ respect to back by default.
@@ -46,7 +46,7 @@ void Stepper::stepCW(int pulseDelay = 100) {
     delayMicroseconds(pulseDelay);
 }
 
-void Stepper::stepCCW(int pulseDelay = 100) {
+void Stepper::stepCCW(int pulseDelay) {
 
     //int pulseDelay = 100;
     digitalWrite(dirPin, LOW);

@@ -8,7 +8,7 @@
 #ifndef L298N_h
 #define L298N_h
 
-#include "Arduino.h"
+//#include "Arduino.h"
 
 class L298N {
     private:
@@ -21,20 +21,20 @@ class L298N {
 
     public:
         L298N(int A1, int A2, int Aspeed, int B1, int B2, int Bspeed){
-
-            pinMode(A1, OUTPUT);
-            pinMode(A2, OUTPUT);
-            pinMode(Aspeed, OUTPUT);
-            pinMode(B1, OUTPUT);
-            pinMode(B2, OUTPUT);
-            pinMode(Bspeed, OUTPUT);
-
             dir1PinA = A1;
             dir2PinA = A2;
             speedPinA = Aspeed;
             dir1PinB = B1;
             dir2PinB = B2;
             speedPinB = Bspeed;
+
+            pinMode(dir1PinA, OUTPUT);
+            pinMode(dir2PinA, OUTPUT);
+            pinMode(speedPinA, OUTPUT);
+            pinMode(dir1PinB, OUTPUT);
+            pinMode(dir2PinB, OUTPUT);
+            pinMode(speedPinB, OUTPUT);
+
         }
 
         void drive(char dir, char motor, int _speed){

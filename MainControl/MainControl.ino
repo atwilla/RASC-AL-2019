@@ -17,7 +17,7 @@ const int heatingPin = 52;
 const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
 const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
 
-Relay HeatingElement(heatingPin);
+Relay heatingElement(heatingPin);
 
 //Enable, direction, pulse.
 Stepper transMotors(transEnPin, transDirPin, transPulPin);
@@ -202,6 +202,9 @@ void loop() {
   // Heating actions
   if (heatingEn) {
     // Actiate heating element.
+    heatingElement.activate();
+  } else {
+    heatingElement.deactivate();
   }
   
   // Transverse stepper actions
