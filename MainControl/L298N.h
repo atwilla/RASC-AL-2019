@@ -20,12 +20,12 @@ class L298N {
         int speedPinB;
 
     public:
-        L298N(int A1, int A2, int Aspeed, int B1, int B2, int Bspeed){
+        L298N(int A1, int A2, int Aspeed, int bForward, int bReverse, int Bspeed) {
             dir1PinA = A1;
             dir2PinA = A2;
             speedPinA = Aspeed;
-            dir1PinB = B1;
-            dir2PinB = B2;
+            dir1PinB = bForward;
+            dir2PinB = bReverse;
             speedPinB = Bspeed;
 
             pinMode(dir1PinA, OUTPUT);
