@@ -4,6 +4,7 @@
 class Relay {
 	private:
 		int inputPin;
+    int powerPin;
 
 	public:
 		Relay(int inputPin) {
