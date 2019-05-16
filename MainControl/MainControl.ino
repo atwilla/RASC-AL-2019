@@ -21,8 +21,8 @@ const int heatingPin = 52;
 const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
 const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
 
-LinActuator largeActuator(lAct1, lAct2, lActPower);
-LinActuator smallActuator(sAct1, sAct2, sActPower);
+LinActuator largeActuator(lAct1, lAct2, lActPower, false);
+LinActuator smallActuator(sAct1, sAct2, sActPower, false);
 Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
 
@@ -198,10 +198,10 @@ void loop() {
 
     if (largeLinDir) {
       // Extend.
-      largeActuator.drive(1, 500);
+      largeActuator.drive(1, 255);
     } else {
       // Retract.
-      largeActuator.drive(0, 500);
+      largeActuator.drive(0, 255);
     }
     
   } else {

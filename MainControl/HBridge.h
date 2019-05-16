@@ -26,16 +26,16 @@ class HBridge {
 
 		void closePositive() {
 			// Cause positive voltage polarity
-      turnOn();
 			posRelay->deactivate();
 			negRelay->deactivate();
+      turnOn();
 		}
 
 		void closeNegative() {
 			// Cause negative voltage polarity
-      turnOn();
 			posRelay->activate();
 			negRelay->activate();
+      turnOn();
 		}
 
 		void stop() {
