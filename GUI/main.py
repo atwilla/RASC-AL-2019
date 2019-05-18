@@ -217,15 +217,15 @@ class ActuatorControl(Frame):
 		
 	def extend(self):
 		print(self.codes[1])
-		self.arduino.write(chr(codes[2]).encode())
+		self.arduino.write(chr(self.codes[1]).encode())
 
 	def stop(self):
 		print(self.codes[0])
-		self.arduino.write(chr(codes[0]).encode())
+		self.arduino.write(chr(self.codes[0]).encode())
 
 	def retract(self):
 		print(self.codes[2])
-		self.arduino.write(chr(codes[2]).encode())
+		self.arduino.write(chr(self.codes[2]).encode())
 
 class PumpControl(Frame):
 
@@ -296,7 +296,7 @@ class ControlApp(Frame):
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp()
+root = ControlApp(controlPort="/dev/ttyACM0")
 root.master.title('Excavation Control Program')
 
 root.mainloop()
