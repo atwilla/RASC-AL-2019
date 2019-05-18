@@ -21,8 +21,8 @@ const int heatingPin = 52;
 const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
 const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
 
-LinActuator largeActuator(lAct1, lAct2, lActPower, true);
-LinActuator smallActuator(sAct1, sAct2, sActPower, false);
+LinActuator largeActuator(lAct1, lAct2, lActPower);
+LinActuator smallActuator(sAct1, sAct2, sActPower);
 Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
 
@@ -34,6 +34,8 @@ void setup() {
   Serial.begin(2000000);
   digitalWrite(lAct1, LOW);
   digitalWrite(lAct2, HIGH);
+  largeActuator.turnOn();
+  smallActuator.turnOn();
 }
 
 void loop() {
@@ -164,6 +166,20 @@ void loop() {
 
   // Check all control vars and act accordingly.
 
+  // Transverse stepper actions
+  if (transStepEn) {
+  
+    if (transStep) {
+      
+      if (transStepDir) {
+        transMotors.stepCW(500);
+        
+      } else {
+        transMotors.stepCCW(500);
+      }
+    }
+  }
+
   //Vertical stepper actions
   if (vertStepEn) {
 
@@ -183,10 +199,10 @@ void loop() {
 
     if (smallLinDir) {
       // Extend.
-      //actuators.drive('F', 'B', 125);
+      smallActuator.drive(1);
     } else {
       // Retract.
-      //actuators.drive('R', 'B', 125);
+      smallActuator.drive(0);
     }
     
   } else {
@@ -198,10 +214,10 @@ void loop() {
 
     if (largeLinDir) {
       // Extend.
-      largeActuator.drive(1, 1000);
+      largeActuator.drive(1);
     } else {
       // Retract.
-      largeActuator.drive(0, 1000);
+      largeActuator.drive(0);
     }
     
   } else {
@@ -223,24 +239,8 @@ void loop() {
 
   // Heating actions
   if (heatingEn) {
-    // Actiate heating element.
     heatingElement.activate();
   } else {
     heatingElement.deactivate();
   }
-  
-  // Transverse stepper actions
-  if (transStepEn) {
-  
-    if (transStep) {
-      
-      if (transStepDir) {
-        transMotors.stepCW(500);
-        
-      } else {
-        transMotors.stepCCW(500);
-      }
-    }
-  }
-
 }

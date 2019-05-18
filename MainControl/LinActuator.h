@@ -9,43 +9,38 @@ class LinActuator {
 		HBridge *bridge;
 
 	public:
-		LinActuator(int posPin, int negPin, int powerPin, bool enPWM) {
+		LinActuator(int posPin, int negPin, int powerPin) {
 			this->posPin = posPin;
 			this->negPin = negPin;
       this->powerPin = powerPin;
-      this->enPWM = enPWM;
 			bridge = new HBridge(posPin, negPin, powerPin);
-      bridge->turnOn();
+
+     pinMode(powerPin, OUTPUT);
+      //bridge->turnOn();
 		}
+
+    void turnOff() {
+      // Cut off power to the actuator through a relay.
+      digitalWrite(powerPin, HIGH);
+    }
+
+    void turnOn() {
+      // Supply power to the actuator through a relay.
+      digitalWrite(powerPin, LOW);
+    }
 
 		~LinActuator() {
 			delete this->bridge;
 		}
 
-		void drive(int dir, int actSpeed) {
+		void drive(int dir) {
+      // Drive actuator forward or backward.
 
 			if (dir) {
-				//bridge->closePositive();
-        digitalWrite(negPin, HIGH);
-
-        // Since this state needs relays to be off, pulse must be inverted.
-        if (enPWM) {
-          analogWrite(posPin, 255);  
-        }
-        
+				bridge->closePositive();
 			} else {
-				//bridge->closeNegative();
-        digitalWrite(negPin, LOW);
-
-        if (enPWM) {
-          analogWrite(posPin, 0);
-        }
+				bridge->closeNegative();
 			}
-
-      // Test this before using above PWM code.
-      //delayMicroseconds(1000);
-			//bridge->stop();
-      //delayMicroseconds(actSpeed);
 		}
 
 		void stop() {
