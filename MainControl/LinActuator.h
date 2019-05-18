@@ -25,23 +25,27 @@ class LinActuator {
 		void drive(int dir, int actSpeed) {
 
 			if (dir) {
-				bridge->closePositive();
-        
+				//bridge->closePositive();
+        digitalWrite(negPin, HIGH);
+
+        // Since this state needs relays to be off, pulse must be inverted.
         if (enPWM) {
-          analogWrite(powerPin, actSpeed);  
+          analogWrite(posPin, 255);  
         }
         
 			} else {
-				bridge->closeNegative();
+				//bridge->closeNegative();
+        digitalWrite(negPin, LOW);
 
         if (enPWM) {
-          analogWrite(powerPin, actSpeed);
+          analogWrite(posPin, 0);
         }
 			}
 
       // Test this before using above PWM code.
-			bridge->stop();
-			delayMicroseconds(actSpeed);
+      //delayMicroseconds(1000);
+			//bridge->stop();
+      //delayMicroseconds(actSpeed);
 		}
 
 		void stop() {

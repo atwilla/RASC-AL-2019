@@ -8,7 +8,7 @@ class Relay {
 
 	public:
 		Relay(int inputPin) {
-			// Activate given pin. Keep relay at normally clsoed position.
+			// Activate given pin. Keep relay at normally closed position.
 			this->inputPin = inputPin;
 			pinMode(inputPin, OUTPUT);
 			digitalWrite(inputPin, HIGH);
