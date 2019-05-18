@@ -14,14 +14,14 @@ bool pumpEn = false, pumpDir = true;
 bool largeLinEn = false, largeLinDir = true;
 bool smallLinEn = false, smallLinDir = true;
 
-const int lAct1 = 30, lAct2 = 32, lActPower = 2;
+const int lAct1 = 2, lAct2 = 32, lActPower = 26;
 const int sAct1 = 31, sAct2 = 33, sActPower = 3;
 const int pumpPin = 51;
 const int heatingPin = 52;
 const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
 const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
 
-LinActuator largeActuator(lAct1, lAct2, lActPower, false);
+LinActuator largeActuator(lAct1, lAct2, lActPower, true);
 LinActuator smallActuator(sAct1, sAct2, sActPower, false);
 Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
@@ -198,10 +198,10 @@ void loop() {
 
     if (largeLinDir) {
       // Extend.
-      largeActuator.drive(1, 255);
+      largeActuator.drive(1, 1000);
     } else {
       // Retract.
-      largeActuator.drive(0, 255);
+      largeActuator.drive(0, 1000);
     }
     
   } else {
