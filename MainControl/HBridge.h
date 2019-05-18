@@ -12,10 +12,11 @@ class HBridge {
 		HBridge(int posRelayPin, int negRelayPin, int powerPin) {
 			// Assumes posRelay is placed at positive terminal of motor 
 			// and negRelay at negative terminal.
+      pinMode(powerPin, OUTPUT);
 			this->posRelay = new Relay(posRelayPin);
 			this->negRelay = new Relay(negRelayPin);
       this->powerPin = powerPin;
-      this->turnOff();
+      //this->turnOff();
 			this->stop();
 		}
 
@@ -26,22 +27,24 @@ class HBridge {
 
 		void closePositive() {
 			// Cause positive voltage polarity
+      //turnOn();
 			posRelay->deactivate();
 			negRelay->deactivate();
-      turnOn();
 		}
 
 		void closeNegative() {
 			// Cause negative voltage polarity
+      //turnOn();
 			posRelay->activate();
 			negRelay->activate();
-      turnOn();
 		}
 
 		void stop() {
 			// Mismatching states results in an open circuit.
      // Cut off power to the relays.
-			turnOff();
+			//turnOff();
+      posRelay->deactivate();
+      negRelay->activate();
 		}
 
     void turnOn() {
