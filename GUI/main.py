@@ -40,9 +40,13 @@ class ControlPane(Frame):
 
 		self.safetyControls = SafetyControl(self)
 		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
+		self.stepperControlTrans.cwSwitch['text'] = "Drive Backwards"
+		self.stepperControlTrans.ccwSwitch['text'] = "Drive Forwards"
 		self.stepperControlVert = StepperControl(self, range(60, 65), "Vertical Stepper Control")
-		self.actuatorControlLarge = ActuatorControl(self, range(40, 43), "Large Actuator Control")
-		self.actuatorControlSmall = ActuatorControl(self, range(50, 53), "Small Acutator Control")
+		self.stepperControlVert.cwSwitch['text'] = "Drive Down"
+		self.stepperControlVert.ccwSwitch['text'] = "Drive Up"
+		self.actuatorControlLarge = ActuatorControl(self, range(40, 45), "Large Actuator Control")
+		self.actuatorControlSmall = ActuatorControl(self, range(50, 55), "Small Acutator Control")
 		self.heatingControl = HeatingControl(self, [20, 21])
 		self.pumpControl = PumpControl(self, range(30, 33))
 
@@ -123,6 +127,8 @@ class StepperControl(Frame):
 		self.title = Label(self, text=title)
 		self.enableDisable = Button(self, text="Disbale", command=self.switchMode)
 		self.cwSwitch = Button(self, text="Step CW", command=self.driveCW)
+		# self.cwSwitch.bind("<ButtonPress-1>", lambda event: self.driveCW())
+		# self.cwSwitch.bind("<ButtonRelease-1>", lambda event: self.stopMotors())
 		self.stopSwitch = Button(self, text="Stop Motors", command=self.stopMotors)
 		self.ccwSwitch = Button(self, text="Step CCW", command=self.driveCCW)
 		
@@ -206,26 +212,43 @@ class ActuatorControl(Frame):
 		self.title = Label(self, text=title)
 		self.codes = codes
 
-		self.extendSwitch = Button(self, text="Extend", command=self.extend)
-		self.stopSwitch = Button(self, text="Stop", command=self.stop)
-		self.retractSwitch = Button(self, text="Retract", command=self.retract)
+		self.extendSwitch = Button(self, text="Extend")
+		self.extendSwitch.bind("<ButtonPress-1>", lambda event: self.extend())
+		self.extendSwitch.bind("<ButtonRelease-1>", lambda event: self.stop())
+		# self.extendPulseSwitch = Button(self, text="Extend Pulse", command=self.extendPulse)
+		# self.stopSwitch = Button(self, text="Stop", command=self.stop)
+		# self.retractPulseSwitch = Button(self, text="Retract Pulse", command=self.retractPulse)
+		self.retractSwitch = Button(self, text="Retract")
+		self.retractSwitch.bind("<ButtonPress-1>", lambda event: self.retract())
+		self.retractSwitch.bind("<ButtonRelease-1>", lambda event: self.stop())
+		# self.extendPulseSwitch = Button(self, text="Extend Pulse")
 
 		self.title.pack()
 		self.extendSwitch.pack(side=LEFT)
-		self.stopSwitch.pack(side=LEFT)
+		# self.extendPulseSwitch.pack(side=LEFT)
+		# self.stopSwitch.pack(side=LEFT)
+		# self.retractPulseSwitch.pack(side=LEFT)
 		self.retractSwitch.pack(side=LEFT)
 		
 	def extend(self):
 		print(self.codes[1])
-		self.arduino.write(chr(self.codes[1]).encode())
+		# self.arduino.write(chr(self.codes[1]).encode())
+
+	def extendPulse(self):
+		print(self.codes[3])
+		self.arduino.write(chr(self.codes[3]).encode())
 
 	def stop(self):
 		print(self.codes[0])
-		self.arduino.write(chr(self.codes[0]).encode())
+		# self.arduino.write(chr(self.codes[0]).encode())
 
 	def retract(self):
 		print(self.codes[2])
-		self.arduino.write(chr(self.codes[2]).encode())
+		# self.arduino.write(chr(self.codes[2]).encode())
+
+	def retractPulse(self):
+		print(self.codes[4])
+		self.arduino.write(chr(self.codes[4]).encode())
 
 class PumpControl(Frame):
 
@@ -296,7 +319,7 @@ class ControlApp(Frame):
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp(controlPort="/dev/ttyACM0")
+root = ControlApp(controlPort=None)
 root.master.title('Excavation Control Program')
 
 root.mainloop()
