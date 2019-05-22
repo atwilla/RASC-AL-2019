@@ -187,12 +187,12 @@ class HeatingControl(Frame):
 
 		# If heating on, disable, and allow activation.
 		if self.state:
-			print(self.codes[0])
-			self.arduino.write(chr(codes[0]).encode())
+			print(self.codes[1])
+			self.arduino.write(chr(self.codes[1]).encode())
 			self.switch['text'] = "Activate Heating"
 		else:
-			print(self.codes[1])
-			self.arduino.write(chr(codes[1]).encode())
+			print(self.codes[0])
+			self.arduino.write(chr(self.codes[0]).encode())
 			self.switch['text'] = "Disable Heating"
 
 		self.state = not self.state
@@ -247,15 +247,15 @@ class PumpControl(Frame):
 
 	def stopPump(self):
 		print(self.codes[0])
-		self.arduino.write(chr(codes[0]).encode())
+		self.arduino.write(chr(self.codes[0]).encode())
 
 	def pumpForw(self):
 		print(self.codes[1])
-		self.arduino.write(chr(codes[1]).encode())
+		self.arduino.write(chr(self.codes[1]).encode())
 
 	def pumpBack(self):
 		print(self.codes[2])
-		self.arduino.write(chr(codes[1]).encode())
+		self.arduino.write(chr(self.codes[1]).encode())
 
 class DigitalCore(Frame):
 
