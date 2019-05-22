@@ -11,11 +11,13 @@ float getIMax(int sensorPin) {
     
     // Current sensor outputs voltage such that 512 = 0 Amps. 
     // Below = negative, above = positive.
-    if (abs(currRead - 512) > maxRead) maxRead = currRead;
+    if (currRead > maxRead) {
+      maxRead = currRead;
+    }
   }
 
   // Convert analog read to a voltage in mV. Convert that to Amps.
-  float IMax = (maxRead / 1023.0) * 5000 / mVPerAmp;
+  float IMax = ((maxRead / 1023.0) * 5000 - 2500) / mVPerAmp;
   return IMax;
 }
 
@@ -26,5 +28,6 @@ void setup() {
 
 void loop() {
   float amps = getIMax(currentSensor);
+  delay(1000);
   Serial.println(amps);
 }
