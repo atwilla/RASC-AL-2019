@@ -16,7 +16,6 @@ class HBridge {
 			this->posRelay = new Relay(posRelayPin);
 			this->negRelay = new Relay(negRelayPin);
       this->powerPin = powerPin;
-      //this->turnOff();
 			this->stop();
 		}
 
@@ -41,8 +40,6 @@ class HBridge {
 
 		void stop() {
 			// Mismatching states results in an open circuit.
-     // Cut off power to the relays.
-			//turnOff();
       posRelay->deactivate();
       negRelay->activate();
 		}

@@ -16,6 +16,7 @@ class LinActuator {
 			bridge = new HBridge(posPin, negPin, powerPin);
 
      pinMode(powerPin, OUTPUT);
+     pinMode(powerPin, HIGH);
       //bridge->turnOn();
 		}
 

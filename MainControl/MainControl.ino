@@ -14,12 +14,12 @@ bool pumpEn = false, pumpDir = true;
 bool largeLinEn = false, largeLinDir = true;
 bool smallLinEn = false, smallLinDir = true;
 
-const int lAct1 = 2, lAct2 = 32, lActPower = 26;
-const int sAct1 = 31, sAct2 = 33, sActPower = 3;
-const int pumpPin = 51;
+const int lAct1 = 49, lAct2 = 48, lActPower = 46;
+const int sAct1 = 51, sAct2 = 50, sActPower = lActPower;
+const int pumpPin = 53;
 const int heatingPin = 52;
-const int transEnPin = 22, transDirPin = 24, transPulPin = 26;
-const int vertEnPin = 23, vertDirPin = 25, vertPulPin = 27;
+const int transEnPin = 23, transDirPin = 25, transPulPin = 27;
+const int vertEnPin = 22, vertDirPin = 24, vertPulPin = 26;
 
 LinActuator largeActuator(lAct1, lAct2, lActPower);
 LinActuator smallActuator(sAct1, sAct2, sActPower);
@@ -32,10 +32,7 @@ Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin);
 
 void setup() {
   Serial.begin(2000000);
-  digitalWrite(lAct1, LOW);
-  digitalWrite(lAct2, HIGH);
-  largeActuator.turnOn();
-  smallActuator.turnOn();
+  digitalWrite(lActPower, LOW);
 }
 
 void loop() {
@@ -206,7 +203,7 @@ void loop() {
     }
     
   } else {
-    //actuators.stop('B');
+    smallActuator.stop();
   }
 
   // Large actuator actions.
