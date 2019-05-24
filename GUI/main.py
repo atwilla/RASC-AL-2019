@@ -20,6 +20,30 @@ class SensorPane(Frame):
 		self.digitalCore.pack()
 		self.currentReadings.pack()
 		self.forceReadings.pack()
+		self.updateReadings()
+
+	def updateReadings(self):
+
+		# self.currentReadings.current += 1
+		# self.currentReadings.updateCurrent()
+
+		# self.forceReadings.force += 1
+		# self.forceReadings.updateForce()
+
+		# Read in flag to determine where data should go.
+		if self.arduino.inWaiting() > 0:
+			flag = chr(self.arduino.read(1))
+
+			# read(4) because floats are 4 bytes
+			if flag == 'C':
+				self.currentReadings.current = self.arduino.read(4)
+				self.currentReadings.updateCurrent()
+
+			elif flag == 'W':
+				self.forceReadings.weight = self.arduino.read(4)
+				self.forceReadings.updateForce()
+
+		self.after(500, self.updateReadings)
 
 class ControlPane(Frame):
 	"""
@@ -290,13 +314,36 @@ class CurrentReadings(Frame):
 
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
-		Label(self, text="Current Readings will go here").pack()
+
+		self.arduino = self.master.arduino
+		self.current = 0
+		self.currentLabel = Label(self, text="RMS Current: 0 A")
+
+		self.currentLabel.pack()
+		#self.updateCurrent()
+
+	def updateCurrent(self):
+		self.currentLabel['text'] = "RMS Current: " + str(self.current) + " A"
+
+	# 	if self.arduino.inWaiting() > 0:
+	# 		self.current = self.arduino.read(4)
+	# 		self.currentLabel['text'] = "RMS Current: " + str(self.current + 1) + " A"
+
+	# 	self.after(500, self.updateCurrent)
 
 class ForceReadings(Frame):
 
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
-		Label(self, text="Weight on bit readings will go here").pack()
+
+		self.arduino = self.master.arduino
+		self.force = 0
+		self.forceLabel = Label(self, text="Weight on Bit: 0 lbs")
+
+		self.forceLabel.pack()
+
+	def updateForce(self):
+		self.forceLabel['text'] = "Weight on Bit: " + str(self.force) + " lbs"
 
 class ControlApp(Frame):
 
@@ -321,5 +368,4 @@ class ControlApp(Frame):
 
 root = ControlApp(controlPort=None)
 root.master.title('Excavation Control Program')
-
 root.mainloop()
