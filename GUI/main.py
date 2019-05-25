@@ -39,9 +39,15 @@ class SensorPane(Frame):
 				self.currentReadings.current = self.arduino.read(4)
 				self.currentReadings.updateCurrent()
 
+				with open("currentReadings.txt", "a") as data:
+					print(self.currentReadings.current, file=data)
+
 			elif flag == 'W':
 				self.forceReadings.weight = self.arduino.read(4)
 				self.forceReadings.updateForce()
+
+				with open("forceReadings.txt", "a") as data:
+					print(self.forceReadings.force, file=data)
 
 		self.after(500, self.updateReadings)
 
