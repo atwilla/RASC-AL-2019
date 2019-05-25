@@ -1,9 +1,12 @@
 const int currentSensor = A0;
+const int ff1 = A1, ff2 = A2, ff3 = A3, ff4 = A4;
 const float mVPerAmp = 100.0;
 
 float getIMax(int sensorPin) {
   float maxRead = 0, minRead = 1024, currRead;
-  int start = millis(), limit = (1 / 60) * 1000;
+  int start, limit = 17;
+
+  start = millis();
 
   // Take measurement over 1 period of the current.
   while (millis() - start <= limit) {
@@ -21,13 +24,24 @@ float getIMax(int sensorPin) {
   return IMax;
 }
 
+float getWoB() {
+  return 0.0;
+}
+
 void setup() {
   Serial.begin(2000000);
   pinMode(currentSensor, INPUT);
+  pinMode(ff1, INPUT);
+  pinMode(ff2, INPUT);
+  pinMode(ff3, INPUT);
+  pinMode(ff4, INPUT);
 }
 
 void loop() {
-  float amps = getIMax(currentSensor);
+  float amps = getIMax(currentSensor), weightOnBit = getWoB();
   delay(1000);
-  Serial.println(amps);
+  Serial.print('C');
+  Serial.print(amps);
+  Serial.print('W');
+  Serial.print(weightOnBit);
 }
