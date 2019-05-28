@@ -32,18 +32,22 @@ class SensorPane(Frame):
 
 		# Read in flag to determine where data should go.
 		if self.arduino.inWaiting() > 0:
-			flag = chr(self.arduino.read(1))
+			# flag = chr(int(self.arduino.read(1)))
+			flag = self.arduino.read(3).strip().decode()
+			print(flag)
 
 			# read(4) because floats are 4 bytes
 			if flag == 'C':
-				self.currentReadings.current = self.arduino.read(4)
+				current = float(self.arduino.read(6).strip())
+				print(current)
+				self.currentReadings.current = current
 				self.currentReadings.updateCurrent()
 
 				with open("currentReadings.txt", "a") as data:
 					print(self.currentReadings.current, file=data)
 
 			elif flag == 'W':
-				self.forceReadings.weight = self.arduino.read(4)
+				self.forceReadings.weight = self.arduino.read(6)
 				self.forceReadings.updateForce()
 
 				with open("forceReadings.txt", "a") as data:
@@ -262,7 +266,7 @@ class ActuatorControl(Frame):
 		
 	def extend(self):
 		print(self.codes[1])
-		# self.arduino.write(chr(self.codes[1]).encode())
+		self.arduino.write(chr(self.codes[1]).encode())
 
 	def extendPulse(self):
 		print(self.codes[3])
@@ -270,11 +274,11 @@ class ActuatorControl(Frame):
 
 	def stop(self):
 		print(self.codes[0])
-		# self.arduino.write(chr(self.codes[0]).encode())
+		self.arduino.write(chr(self.codes[0]).encode())
 
 	def retract(self):
 		print(self.codes[2])
-		# self.arduino.write(chr(self.codes[2]).encode())
+		self.arduino.write(chr(self.codes[2]).encode())
 
 	def retractPulse(self):
 		print(self.codes[4])
@@ -372,6 +376,6 @@ class ControlApp(Frame):
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp(controlPort=None)
+root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
 root.master.title('Excavation Control Program')
 root.mainloop()
