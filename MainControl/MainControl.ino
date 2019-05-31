@@ -82,6 +82,16 @@ void loop() {
         // Retract actuator.
         smallLinEn = true;
         smallLinDir = false;
+        
+      } else if (lastDigit == 3) {
+        // Pulse actuator forwards.
+        smallLinEn = true;
+        smallLinDir = true;
+        
+      } else if (lastDigit == 4) {
+        // Pulse actuator backwards.
+        smallLinEn = true;
+        smallLinDir = false;
       }
       
     } else if (controlCode >= 40) {
@@ -97,6 +107,16 @@ void loop() {
         
       } else if (lastDigit == 2) {
         // Retract actuator
+        largeLinEn = true;
+        largeLinDir = false;
+        
+      } else if (lastDigit == 3) {
+        // Pulse actuator forwards.
+        largeLinEn = true;
+        largeLinDir = true;
+        
+      } else if (lastDigit == 4) {
+        // Pulse actuator backwards.
         largeLinEn = true;
         largeLinDir = false;
       }
