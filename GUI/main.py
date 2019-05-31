@@ -1,4 +1,5 @@
 import serial
+import time
 from tkinter import *
 
 class SensorPane(Frame):
@@ -13,6 +14,7 @@ class SensorPane(Frame):
 		self.arduino = monitorPort
 		self.controlArduino = controlPort
 		self.record = False
+		self.startTime = time.time()
 
 		self.currentReadings = CurrentReadings(self)
 		self.forceReadings = ForceReadings(self)
@@ -54,6 +56,9 @@ class SensorPane(Frame):
 						with open("currentReadings.txt", "a") as data:
 							print(current, file=data)
 
+						with open("time.txt", "a") as data:
+							print((time.time() - self.startTime) / 1000.0, file=data)
+
 				elif flag == 'W':
 					weight = float(self.arduino.read(6).strip())
 					self.forceReadings.weight = weight
@@ -78,7 +83,7 @@ class SensorPane(Frame):
 			print("No port connected")
 
 		finally:
-			self.after(500, self.updateReadings)
+			self.after(250, self.updateReadings)
 
 	def changeRecord(self):
 		self.record = not self.record
