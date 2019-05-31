@@ -27,8 +27,8 @@ Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
 
 //Enable, direction, pulse.
-Stepper transMotors(transEnPin, transDirPin, transPulPin);
-Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin);
+Stepper transMotors(transEnPin, transDirPin, transPulPin, 1.8, 1 / 64, 0.15);
+Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin, 1.8, 1 / 64, 0.2);
 
 void setup() {
   Serial.begin(2000000);
@@ -62,6 +62,9 @@ void loop() {
           break;
         case 4:
           vertStep = false;
+          break;
+        case 5:
+          vertMotor.resetDistance();
           break;
         default:
           break;
@@ -203,11 +206,15 @@ void loop() {
     if (vertStep) {
 
       if (vertStepDir) {
-        vertMotor.stepCW(500); 
+        vertMotor.stepCW(500);
+        vertMotor.updateDistance(true);
              
       } else {
         vertMotor.stepCCW(500);
+        vertMotor.updateDistance(false);
       }
+
+      Serial.println(vertMotor.distanceTravelled);
     }
   }
 

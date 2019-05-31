@@ -8,18 +8,19 @@ class SensorPane(Frame):
 	as current readings, weight on bit, and the digital core.
 	"""
 
-	def __init__(self, master=None, serialPort=None):
+	def __init__(self, master=None, monitorPort=None, controlPort=None):
 		Frame.__init__(self, master=None)
 
-		self.arduino = serialPort
+		self.arduino = monitorPort
+		self.controlArduino = controlPort
 
-		self.digitalCore = DigitalCore(self)
 		self.currentReadings = CurrentReadings(self)
 		self.forceReadings = ForceReadings(self)
+		self.depthReadings = StepperMonitor(self.controlArduino, 65, self)
 
-		self.digitalCore.pack()
 		self.currentReadings.pack()
 		self.forceReadings.pack()
+		self.depthReadings.pack()
 		self.updateReadings()
 
 	def updateReadings(self):
@@ -31,29 +32,42 @@ class SensorPane(Frame):
 		# self.forceReadings.updateForce()
 
 		# Read in flag to determine where data should go.
-		if self.arduino.inWaiting() > 0:
-			# flag = chr(int(self.arduino.read(1)))
-			flag = self.arduino.read(3).strip().decode()
-			print(flag)
+		try:
+			if self.arduino.inWaiting() > 0:
+				# flag = chr(int(self.arduino.read(1)))
+				flag = self.arduino.read(3).strip().decode()
+				print(flag)
 
-			# read(4) because floats are 4 bytes
-			if flag == 'C':
-				current = float(self.arduino.read(6).strip())
-				print(current)
-				self.currentReadings.current = current
-				self.currentReadings.updateCurrent()
+				# read(4) because floats are 4 bytes
+				if flag == 'C':
+					current = float(self.arduino.read(6).strip())
+					print(current)
+					self.currentReadings.current = current
+					self.currentReadings.updateCurrent()
 
-				with open("currentReadings.txt", "a") as data:
-					print(self.currentReadings.current, file=data)
+					with open("currentReadings.txt", "a") as data:
+						print(self.currentReadings.current, file=data)
 
-			elif flag == 'W':
-				self.forceReadings.weight = self.arduino.read(6)
-				self.forceReadings.updateForce()
+				elif flag == 'W':
+					weight = float(self.arduino.read(6).strip())
+					self.forceReadings.weight = weight
+					self.forceReadings.updateForce()
 
-				with open("forceReadings.txt", "a") as data:
-					print(self.forceReadings.force, file=data)
+					with open("forceReadings.txt", "a") as data:
+						print(self.forceReadings.force, file=data)
 
-		self.after(500, self.updateReadings)
+				elif flag == 'D':
+					distance = float(self.depthReadings.arduino.read(6).strip())
+					self.depthReadings.distance = distance
+					self.depthReadings.updateLabel()
+
+			self.after(500, self.updateReadings)
+
+		except AttributeError:
+			print("No port connected")
+
+		finally:
+			self.after(500, self.updateReadings)
 
 class ControlPane(Frame):
 	"""
@@ -205,6 +219,30 @@ class StepperControl(Frame):
 		print(self.codes[4])
 		self.arduino.write(chr(self.codes[4]).encode())
 
+class StepperMonitor(Frame):
+
+	def __init__(self, arduino, code, master=None):
+		Frame.__init__(self, master)
+
+		self.arduino = arduino
+		# Code used to signal arduino to rest stepper distance.
+		self.code = code
+		self.distance = 0
+
+		self.distanceLabel = Label(self, text="Stepper Depth: " + str(self.distance) + " m")
+		self.zeroButton = Button(self, text="Zero Distance", command=self.zero)
+
+		self.distanceLabel.pack()
+		self.zeroButton.pack()
+
+	def zero(self):
+		self.distance = 0
+		self.updateLabel()
+		self.arduino.write(chr(self.code).encode())
+
+	def updateLabel(self):
+		self.distanceLabel['text'] = "Stepper Depth: " + str(self.distance) + " m"
+
 class HeatingControl(Frame):
 	"""
 	This frame contains controls for the heating element.
@@ -348,12 +386,12 @@ class ForceReadings(Frame):
 
 		self.arduino = self.master.arduino
 		self.force = 0
-		self.forceLabel = Label(self, text="Weight on Bit: 0 lbs")
+		self.forceLabel = Label(self, text="Weight on Bit: 0 N")
 
 		self.forceLabel.pack()
 
 	def updateForce(self):
-		self.forceLabel['text'] = "Weight on Bit: " + str(self.force) + " lbs"
+		self.forceLabel['text'] = "Weight on Bit: " + str(self.force) + " N"
 
 class ControlApp(Frame):
 
@@ -371,11 +409,12 @@ class ControlApp(Frame):
 			self.monitorArduino = serial.Serial(monitorPort, 2000000)
 
 		self.controlPane = ControlPane(self, serialPort=self.controlArduino)
-		self.sensorPane = SensorPane(self, serialPort=self.monitorArduino)
+		self.sensorPane = SensorPane(self, monitorPort=self.monitorArduino, controlPort=self.controlArduino)
 
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
+root = ControlApp(controlPort=None, monitorPort=None)
+#root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
 root.master.title('Excavation Control Program')
 root.mainloop()

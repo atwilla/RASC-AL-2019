@@ -1,26 +1,34 @@
 class Stepper {
   public:
-    Stepper(int enablePin, int dirPin, int pulsePin);
+    Stepper(int enablePin, int dirPin, int pulsePin, float stepAngle, float microstep, float distPerTurn);
     void stepCW(int pulseDelay = 100);
     void stepCCW(int pulseDelay = 100);
     void disable();
     void enable();
+    void updateDistance(bool dir);
+    void resetDistance();
+    int distanceTravelled;
 
   private:
     int enablePin;
     int pulsePin;
     int dirPin;
-    int pulseDelay;
+    float stepAngle;
+    float microstep;
+    float distPerTurn;
 };
 
-Stepper::Stepper(int enablePin, int dirPin, int pulsePin) {
+Stepper::Stepper(int enablePin, int dirPin, int pulsePin, float stepAngle, float microstep, float distPerTurn) {
     // Constructor for Stepper class. Given pins will be enabled 
     // as output pins.
    
     this->enablePin = enablePin;
     this->pulsePin = pulsePin;
     this->dirPin = dirPin;
-    //this->pulseDelay = 100;
+    this->distanceTravelled = 0;
+    this->stepAngle = stepAngle;
+    this->microstep = microstep;
+    this->distPerTurn = distPerTurn;
     
     // Reduce code required to use stepper.
     pinMode(enablePin, OUTPUT);
@@ -67,4 +75,16 @@ void Stepper::disable() {
 	digitalWrite(enablePin, HIGH);
   digitalWrite(dirPin, LOW);
   digitalWrite(pulsePin, LOW);
+}
+
+void Stepper::updateDistance(bool dir) {
+  if (dir) {
+    distanceTravelled += distPerTurn * stepAngle * microstep * 2;
+  } else {
+    distanceTravelled -= distPerTurn * stepAngle * microstep * 2;
+  }
+}
+
+void Stepper::resetDistance() {
+  distanceTravelled = 0;
 }
