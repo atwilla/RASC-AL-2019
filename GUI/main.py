@@ -1,4 +1,3 @@
-import tkinter
 import serial
 from tkinter import *
 
@@ -13,14 +12,21 @@ class SensorPane(Frame):
 
 		self.arduino = monitorPort
 		self.controlArduino = controlPort
+		self.record = False
 
 		self.currentReadings = CurrentReadings(self)
 		self.forceReadings = ForceReadings(self)
 		self.depthReadings = StepperMonitor(self.controlArduino, 65, self)
+		self.recordData = Checkbutton(self, text="Record Data", 
+			variable=self.record, command=self.changeRecord)
+
+		self.clearDataButton = Button(self, text="Clear Data", command=self.clearData)
 
 		self.currentReadings.pack()
 		self.forceReadings.pack()
 		self.depthReadings.pack()
+		self.recordData.pack()
+		self.clearDataButton.pack()
 		self.updateReadings()
 
 	def updateReadings(self):
@@ -41,25 +47,30 @@ class SensorPane(Frame):
 				# read(4) because floats are 4 bytes
 				if flag == 'C':
 					current = float(self.arduino.read(6).strip())
-					print(current)
 					self.currentReadings.current = current
 					self.currentReadings.updateCurrent()
 
-					with open("currentReadings.txt", "a") as data:
-						print(self.currentReadings.current, file=data)
+					if self.record:
+						with open("currentReadings.txt", "a") as data:
+							print(current, file=data)
 
 				elif flag == 'W':
 					weight = float(self.arduino.read(6).strip())
 					self.forceReadings.weight = weight
 					self.forceReadings.updateForce()
 
-					with open("forceReadings.txt", "a") as data:
-						print(self.forceReadings.force, file=data)
+					if self.record:
+						with open("forceReadings.txt", "a") as data:
+							print(weight, file=data)
 
 				elif flag == 'D':
 					distance = float(self.depthReadings.arduino.read(6).strip())
 					self.depthReadings.distance = distance
 					self.depthReadings.updateLabel()
+
+					if self.record:
+						with open("depthReadings.txt", "a") as data:
+							print(distance, file=data)
 
 			self.after(500, self.updateReadings)
 
@@ -68,6 +79,15 @@ class SensorPane(Frame):
 
 		finally:
 			self.after(500, self.updateReadings)
+
+	def changeRecord(self):
+		self.record = not self.record
+
+	def clearData(self):
+		dataFiles = ["currentReadings.txt", "depthReadings.txt", "forceReadings.txt"]
+
+		for file in dataFiles:
+			open(file, "w").close()
 
 class ControlPane(Frame):
 	"""
