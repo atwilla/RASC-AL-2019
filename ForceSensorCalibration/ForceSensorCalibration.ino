@@ -1,13 +1,16 @@
-const int sensorPin = A0;
+const int sensors[4] = {A0, A1, A2, A3};
 char start;
 
 void setup() {
   Serial.begin(2000000);
-  pinMode(sensorPin, INPUT);
+
+  for (int i = 0; i < 4; i++) {
+    pinMode(sensors[i], INPUT);
+  }
 }
 
 void loop() {
-  float sum = 0, avg;
+  float grandSum = 0;
   start = 'a';
   
   if (Serial.available()) {
@@ -15,14 +18,24 @@ void loop() {
   }
 
   if (start == 's') {
-
-    for (int i = 0; i < 1000; i++) {
-      sum += analogRead(sensorPin);
+    for (int sensor = 0; sensor < 4; sensor++) {
+  
+      float sum = 0, avg;
+  
+      for (int i = 0; i < 100; i++) {
+        sum += analogRead(sensors[sensor]);
+      }
+  
+      avg = sum / 100;
+      grandSum += avg;
+  
+      Serial.print("Sensor ");
+      Serial.print(sensor);
+      Serial.print(": ");
+      Serial.println(avg);
     }
-
-    avg = sum / 1000;
-
-    Serial.print("Average Value Read: ");
-    Serial.println(avg);
+  
+    Serial.print("Sum: ");
+    Serial.println(grandSum);
   }
 }
