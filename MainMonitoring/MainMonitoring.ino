@@ -29,7 +29,7 @@ float getWeight() {
 }
 
 float getWoB() {
-  return getWeight() - baseWeight;
+  return baseWeight - getWeight();
 }
 
 void setup() {
