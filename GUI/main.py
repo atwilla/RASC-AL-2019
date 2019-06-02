@@ -43,7 +43,7 @@ class SensorPane(Frame):
 		try:
 			if self.arduino.inWaiting() > 0:
 				# flag = chr(int(self.arduino.read(1)))
-				flag = self.arduino.read(3).strip().decode()
+				flag = self.arduino.read(3).decode().strip()
 				print(flag)
 
 				# read(4) because floats are 4 bytes
@@ -77,19 +77,19 @@ class SensorPane(Frame):
 						with open("depthReadings.txt", "a") as data:
 							print(distance, file=data)
 
-			self.after(500, self.updateReadings)
+			self.after(250, self.updateReadings)
 
 		except AttributeError:
 			print("No port connected")
 
-		finally:
-			self.after(250, self.updateReadings)
+		# finally:
+		# 	self.after(250, self.updateReadings)
 
 	def changeRecord(self):
 		self.record = not self.record
 
 	def clearData(self):
-		dataFiles = ["currentReadings.txt", "depthReadings.txt", "forceReadings.txt"]
+		dataFiles = ["currentReadings.txt", "depthReadings.txt", "forceReadings.txt", "time.txt"]
 
 		for file in dataFiles:
 			open(file, "w").close()
@@ -119,7 +119,7 @@ class ControlPane(Frame):
 		self.stepperControlVert.cwSwitch['text'] = "Drive Down"
 		self.stepperControlVert.ccwSwitch['text'] = "Drive Up"
 		self.actuatorControlLarge = ActuatorControl(self, range(40, 45), "Large Actuator Control")
-		self.actuatorControlSmall = ActuatorControl(self, range(50, 55), "Small Acutator Control")
+		self.actuatorControlSmall = ActuonixControl(self, range(50, 55), "Small Acutator Control")
 		self.heatingControl = HeatingControl(self, [20, 21])
 		self.pumpControl = PumpControl(self, range(30, 33))
 
@@ -347,6 +347,33 @@ class ActuatorControl(Frame):
 		print(self.codes[4])
 		self.arduino.write(chr(self.codes[4]).encode())
 
+class ActuonixControl(Frame):
+
+	def __init__(self, master=None, codes=range(3), title="Actuator Control"):
+		Frame.__init__(self, master)
+
+		self.arduino = self.master.arduino
+		self.title = Label(self, text=title)
+		self.codes = codes
+
+		self.extendSwitch = Button(self, text="Extend")
+		self.extendSwitch.bind("<ButtonPress-1>", lambda event: self.extend())
+		# self.extendSwitch.bind("<ButtonRelease-1>", lambda event: self.stop())
+		# self.extendPulseSwitch = Button(self, text="Extend Pulse", command=self.extendPulse)
+		# self.stopSwitch = Button(self, text="Stop", command=self.stop)
+		# self.retractPulseSwitch = Button(self, text="Retract Pulse", command=self.retractPulse)
+		self.retractSwitch = Button(self, text="Retract")
+		self.retractSwitch.bind("<ButtonPress-1>", lambda event: self.retract())
+		# self.retractSwitch.bind("<ButtonRelease-1>", lambda event: self.stop())
+		# self.extendPulseSwitch = Button(self, text="Extend Pulse")
+
+		self.title.pack()
+		self.extendSwitch.pack(side=LEFT)
+		# self.extendPulseSwitch.pack(side=LEFT)
+		# self.stopSwitch.pack(side=LEFT)
+		# self.retractPulseSwitch.pack(side=LEFT)
+		self.retractSwitch.pack(side=LEFT)
+
 class PumpControl(Frame):
 
 	def __init__(self, master=None, codes=range(3), title="Pump Control"):
@@ -439,7 +466,7 @@ class ControlApp(Frame):
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp(controlPort=None, monitorPort=None)
+root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
 #root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
 root.master.title('Excavation Control Program')
 root.mainloop()
