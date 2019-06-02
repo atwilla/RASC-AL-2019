@@ -111,7 +111,7 @@ class ControlPane(Frame):
 
 		self.arduino = serialPort
 
-		self.safetyControls = SafetyControl(self)
+		# self.safetyControls = SafetyControl(self)
 		self.stepperControlTrans = StepperControl(self, range(10, 15), "Transverse Stepper Control")
 		self.stepperControlTrans.cwSwitch['text'] = "Drive Backwards"
 		self.stepperControlTrans.ccwSwitch['text'] = "Drive Forwards"
@@ -123,7 +123,7 @@ class ControlPane(Frame):
 		self.heatingControl = HeatingControl(self, [20, 21])
 		self.pumpControl = PumpControl(self, range(30, 33))
 
-		self.safetyControls.pack()
+		# self.safetyControls.pack()
 		self.stepperControlTrans.pack()
 		self.stepperControlVert.pack()
 		self.actuatorControlLarge.pack()
@@ -254,7 +254,7 @@ class StepperMonitor(Frame):
 		self.code = code
 		self.distance = 0
 
-		self.distanceLabel = Label(self, text="Stepper Depth: " + str(self.distance) + " m")
+		self.distanceLabel = Label(self, text="Stepper Depth: " + str(self.distance) + " cm")
 		self.zeroButton = Button(self, text="Zero Distance", command=self.zero)
 
 		self.distanceLabel.pack()
@@ -266,7 +266,7 @@ class StepperMonitor(Frame):
 		self.arduino.write(chr(self.code).encode())
 
 	def updateLabel(self):
-		self.distanceLabel['text'] = "Stepper Depth: " + str(self.distance) + " m"
+		self.distanceLabel['text'] = "Stepper Depth: " + str(self.distance) + " cm"
 
 class HeatingControl(Frame):
 	"""
@@ -374,6 +374,26 @@ class ActuonixControl(Frame):
 		# self.retractPulseSwitch.pack(side=LEFT)
 		self.retractSwitch.pack(side=LEFT)
 
+	def extend(self):
+		print(self.codes[1])
+		self.arduino.write(chr(self.codes[1]).encode())
+
+	def extendPulse(self):
+		print(self.codes[3])
+		self.arduino.write(chr(self.codes[3]).encode())
+
+	def stop(self):
+		print(self.codes[0])
+		self.arduino.write(chr(self.codes[0]).encode())
+
+	def retract(self):
+		print(self.codes[2])
+		self.arduino.write(chr(self.codes[2]).encode())
+
+	def retractPulse(self):
+		print(self.codes[4])
+		self.arduino.write(chr(self.codes[4]).encode())
+
 class PumpControl(Frame):
 
 	def __init__(self, master=None, codes=range(3), title="Pump Control"):
@@ -383,14 +403,14 @@ class PumpControl(Frame):
 		self.title = Label(self, text=title)
 		self.codes = codes
 
-		self.pumpForwSwitch = Button(self, text="Pump Forward", command=self.pumpForw)
+		self.pumpForwSwitch = Button(self, text="Pump", command=self.pumpForw)
 		self.stopSwitch = Button(self, text="Stop Pump", command=self.stopPump)
 		self.pumpBackSwitch = Button(self, text="Pump BackWard", command=self.pumpBack)
 
 		self.title.pack()
 		self.pumpForwSwitch.pack(side=LEFT)
 		self.stopSwitch.pack(side=LEFT)
-		self.pumpBackSwitch.pack(side=LEFT)
+		# self.pumpBackSwitch.pack(side=LEFT)
 
 	def stopPump(self):
 		print(self.codes[0])
@@ -466,7 +486,7 @@ class ControlApp(Frame):
 		self.controlPane.pack()
 		self.sensorPane.pack()
 
-root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
+root = ControlApp(controlPort=None, monitorPort=None)
 #root = ControlApp(controlPort="/dev/ttyACM0", monitorPort="/dev/ttyACM1")
 root.master.title('Excavation Control Program')
 root.mainloop()
