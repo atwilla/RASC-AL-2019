@@ -214,7 +214,8 @@ void loop() {
         vertMotor.updateDistance(false);
       }
 
-      Serial.println(vertMotor.distanceTravelled);
+      //Serial.println('D');
+      //Serial.println(vertMotor.distanceTravelled);
     }
   }
 
