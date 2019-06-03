@@ -49,9 +49,10 @@ void Stepper::stepCW(int pulseDelay) {
     delayMicroseconds(10);
 
     digitalWrite(pulsePin, HIGH);
-    delayMicroseconds(pulseDelay);
+    //delayMicroseconds(pulseDelay);
     digitalWrite(pulsePin, LOW);
-    delayMicroseconds(pulseDelay);
+    updateDistance(false);
+    //delayMicroseconds(pulseDelay);
 }
 
 void Stepper::stepCCW(int pulseDelay) {
@@ -62,9 +63,10 @@ void Stepper::stepCCW(int pulseDelay) {
     delayMicroseconds(10);
 
     digitalWrite(pulsePin, HIGH);
-    delayMicroseconds(pulseDelay);
+    //delayMicroseconds(pulseDelay);
     digitalWrite(pulsePin, LOW);
-    delayMicroseconds(pulseDelay);
+    updateDistance(true);
+    //delayMicroseconds(pulseDelay);
 }
 
 void Stepper::enable() {

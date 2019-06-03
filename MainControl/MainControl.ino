@@ -22,17 +22,19 @@ const int transEnPin = 23, transDirPin = 25, transPulPin = 27;
 const int vertEnPin = 22, vertDirPin = 24, vertPulPin = 26;
 
 LinActuator largeActuator(lAct1, lAct2, lActPower);
-LinActuator smallActuator(sAct1, sAct2, sActPower);
+//LinActuator smallActuator(sAct1, sAct2, sActPower);
+int smallActuator = 51;
 Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
 
 //Enable, direction, pulse.
 Stepper transMotors(transEnPin, transDirPin, transPulPin, 1.8, 1 / 64, 0.15);
-Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin, 1.8, 1 / 64, 0.2);
+Stepper vertMotor(vertEnPin, vertDirPin, vertPulPin, 1.8, 1 / 64, 0.254);
 
 void setup() {
   Serial.begin(2000000);
   digitalWrite(lActPower, LOW);
+  pinMode(smallActuator, OUTPUT);
 }
 
 void loop() {
@@ -207,11 +209,9 @@ void loop() {
 
       if (vertStepDir) {
         vertMotor.stepCW(500);
-        vertMotor.updateDistance(true);
              
       } else {
         vertMotor.stepCCW(500);
-        vertMotor.updateDistance(false);
       }
 
       //Serial.println('D');
@@ -224,14 +224,14 @@ void loop() {
 
     if (smallLinDir) {
       // Extend.
-      smallActuator.drive(1);
+      digitalWrite(smallActuator, HIGH);
+      //smallActuator.drive(1);
     } else {
       // Retract.
-      smallActuator.drive(0);
+      digitalWrite(smallActuator, LOW);
+      //smallActuator.drive(0);
     }
     
-  } else {
-    smallActuator.stop();
   }
 
   // Large actuator actions.
