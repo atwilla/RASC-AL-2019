@@ -8,17 +8,16 @@ class SensorPane(Frame):
 	as current readings, weight on bit, and the digital core.
 	"""
 
-	def __init__(self, master=None, monitorPort=None, controlPort=None):
+	def __init__(self, master=None, monitorPort=None):
 		Frame.__init__(self, master=None)
 
 		self.arduino = monitorPort
-		self.controlArduino = controlPort
 		self.record = False
 		self.startTime = time.time()
 
 		self.currentReadings = CurrentReadings(self)
 		self.forceReadings = ForceReadings(self)
-		self.depthReadings = StepperMonitor(self.controlArduino, 65, self)
+		self.depthReadings = StepperMonitor(self.arduino, 65, self)
 		self.recordData = Checkbutton(self, text="Record Data", 
 			variable=self.record, command=self.changeRecord)
 
@@ -481,7 +480,7 @@ class ControlApp(Frame):
 			self.monitorArduino = serial.Serial(monitorPort, 2000000)
 
 		self.controlPane = ControlPane(self, serialPort=self.controlArduino)
-		self.sensorPane = SensorPane(self, monitorPort=self.monitorArduino, controlPort=self.controlArduino)
+		self.sensorPane = SensorPane(self, monitorPort=self.monitorArduino)
 
 		self.controlPane.pack()
 		self.sensorPane.pack()
