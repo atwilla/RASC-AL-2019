@@ -1,7 +1,10 @@
-const int currentSensor = A4;
+const int currentSensor = A4, pulsePin = 13;
 const int ff1 = A0, ff2 = A1, ff3 = A2, ff4 = A3;
 const float mVPerAmp = 125.0;
+const float microstep = 1/ 32, cmPerRot = 0.254, stepAngle = 1.8;
 float baseWeight;
+int steps = 0, prevState;
+int startTime;
 
 float getIRMS(int sensorPin) {
   float maxRead = 0, currRead;
@@ -39,15 +42,30 @@ void setup() {
   pinMode(ff2, INPUT);
   pinMode(ff3, INPUT);
   pinMode(ff4, INPUT);
+  pinMode(pulsePin, INPUT);
+  prevState = digitalRead(pulsePin);
 
   baseWeight = getWeight();
+  startTime = millis();
 }
 
 void loop() {
+  int currState = digitalRead(pulsePin);
+  if (prevState != currState) {
+    steps++;
+    prevState = currState;
+  }
+  
   float amps = getIRMS(currentSensor), weightOnBit = getWoB();
-  delay(250);
-  Serial.println('C');
-  Serial.println(amps);
-  Serial.println('W');
-  Serial.println(weightOnBit);
+  float depth = steps *cmPerRot * stepAngle * microstep / 360;
+
+  if (millis() - startTime > 500) {
+    Serial.println('C');
+    Serial.println(amps);
+    Serial.println('W');
+    Serial.println(weightOnBit);
+    Serial.println('D');
+    Serial.println(depth);
+    startTime = millis();
+  }
 }
