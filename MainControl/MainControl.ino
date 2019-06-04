@@ -213,9 +213,6 @@ void loop() {
       } else {
         vertMotor.stepCCW(500);
       }
-
-      //Serial.println('D');
-      //Serial.println(vertMotor.distanceTravelled);
     }
   }
 
