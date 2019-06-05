@@ -23,7 +23,7 @@ const int vertEnPin = 22, vertDirPin = 24, vertPulPin = 26;
 
 LinActuator largeActuator(lAct1, lAct2, lActPower);
 //LinActuator smallActuator(sAct1, sAct2, sActPower);
-int smallActuator = 51;
+const int smallActuator = 2;
 Relay pump(pumpPin);
 Relay heatingElement(heatingPin);
 
@@ -221,11 +221,11 @@ void loop() {
 
     if (smallLinDir) {
       // Extend.
-      digitalWrite(smallActuator, HIGH);
+      analogWrite(smallActuator, 220);
       //smallActuator.drive(1);
     } else {
       // Retract.
-      digitalWrite(smallActuator, LOW);
+      digitalWrite(smallActuator, 20);
       //smallActuator.drive(0);
     }
     
